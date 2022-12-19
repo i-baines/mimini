@@ -6,6 +6,7 @@ SANITIZE= -fsanitize=address
 RM= rm -rf
 FILES= 	testeo \
 		ft_strncmp \
+		utils
 
 LIBFT = libftt/libft.a
 
