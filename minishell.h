@@ -12,6 +12,7 @@ int     ft_free_malloc2(char **src);
 int     open_quotes(char *str);
 char	**ft_split_pipes(char *str);
 char	**ft_split_quotes(char *str);
+void	dequoter(char **mtrx);
 
 typedef struct s_env
 {

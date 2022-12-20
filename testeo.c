@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/19 11:31:05 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/20 19:04:52 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -695,7 +695,7 @@ int	ft_echo(char **src, t_mini *mini)
 	dim = 0;
 	while (src[dim])
 		dim++;
-	if (dim >= 2 && ft_strlen(src[1]) >= 2)
+	if (dim >= 2)
 	{
 		while (ft_strlen(src[i]) == 2 && !ft_strncmp(src[i], "-n", 2))
 		{
@@ -714,9 +714,10 @@ int	ft_echo(char **src, t_mini *mini)
 		{
 			while (src[i])
 			{
-				printf("%s\n", src[i]);	
+				printf("%s ", src[i]);	
 				i++;
 			}
+			printf("\n");
 		}
 	}
 }
@@ -818,6 +819,25 @@ char **ft_malloc(char **src, t_mini *mini)
 
 //void 	ft_getquote(char **str){}
 
+int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
+{
+	int	i;
+
+	i = 0;
+	while (src[0][i])
+		i++;
+	if (ft_strlen("cd") == i && !ft_strncmp(src[0], "cd", 2))
+		return (1);
+	if (ft_strlen("unset") == i && !ft_strncmp(src[0], "unset", 5))
+		return (1);
+	if (ft_strlen("export") == i && !ft_strncmp(src[0], "export", 6))
+		return (1);
+	if (ft_strlen("exit") == i && !ft_strncmp(src[0], "exit", 4))
+		return (1);
+	else
+		return (0);
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	//const char	*src;
@@ -832,7 +852,6 @@ int	main(int argc, char **argv, char **env)
 	i = 0;
  	g_error = 0;
 	ft_print(mini.env);
-	printf("******\n");
    	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
 	signal(SIGABRT, sighandler);
@@ -844,9 +863,7 @@ int	main(int argc, char **argv, char **env)
 	while (1) // separar comandos que hace el padre a los hijos
 	{
 		ptr = readline(BOLD "Minishell $> " CLOSE);
-		//printf("%s\n", ptr);
 		if (ptr == NULL)
-			//continue;
 			return(-1);
 		if (ft_strlen(ptr))
 			add_history(ptr);
@@ -858,29 +875,49 @@ int	main(int argc, char **argv, char **env)
 			if (!mini.split_pipe)
 			{
 				mini.split_quote = ft_split_quotes(ptr);
-				checker(ptr2, mini.split_quote, &mini);
+				if (mini.split_quote[0][0] != -12)
+				{
+					dequoter(mini.split_quote);
+					if (!ft_checkcom(mini.split_quote))
+					{
+						pid = fork();
+						if (pid == 0)
+						{
+							checker(ptr2, mini.split_quote, &mini);
+							exit (-1);
+						}
+						else
+						{
+							if (!ft_strncmp(ptr, "exit", 4))
+								exit (-1);
+							waitpid(pid, NULL, 0);
+						}
+					}
+					else
+						checker(ptr2, mini.split_quote, &mini);		
+				}
+				
 			}
 			else
 			{
-				//printf("Habia pipes\n");
 				ft_print(mini.split_pipe);
 				mini.split_quote =ft_split_quotes(mini.split_pipe[0]);
-								//printf("AAAAAAAAAAA\n\n");
-				ft_print(mini.split_quote);
-			//	printf
-			pid = fork();
-			if (pid == 0)
-			{
-				checker(ptr2, mini.split_quote, &mini);
-				exit (-1);
-			}
-			else
-			{
-				if (!ft_strncmp(ptr, "exit", 4))
-					exit (-1);
-				waitpid(pid, NULL, 0);
-			}
-			free(ptr);
+				if (mini.split_quote[0][0] != -12)
+				{
+					pid = fork();
+					if (pid == 0)
+					{
+						checker(ptr2, mini.split_quote, &mini);
+						exit (-1);
+					}
+					else
+					{
+						if (!ft_strncmp(ptr, "exit", 4))
+							exit (-1);
+						waitpid(pid, NULL, 0);
+					}
+				}
+				free(ptr);
 			}
 		}
 	}

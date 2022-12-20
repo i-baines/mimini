@@ -201,13 +201,6 @@ int	check_mtrx_pipe(char **mtrx)
 	}
 	if (word == i)
 		return (0);
-	i = 0;
-	while (mtrx[i])
-	{
-		free(mtrx[i]);
-		i ++;
-	}
-	free(mtrx);
 	printf("Minishell: Syntax error\n");
 	return (1);
 }
@@ -388,23 +381,73 @@ char	**ft_split_quotes(char *str)
 	int caracter_value;
 	char **splited_argv;
 	char *new_str;
-    char *tempStr;
 
-    tempStr = ft_strdup(str);
-	change_caracter2(tempStr);
-	new_str = ft_replace(tempStr, ' ' -128);
-	caracter_value = change_caracter_q(new_str);
+	caracter_value = change_caracter2(str);
 	if (caracter_value > 0)
 	{
-		splited_argv = ft_split(new_str, -128);
+		splited_argv = ft_split(str, ' ' -128);
 		if(check_mtrx_pipe(splited_argv))
-        {
-            free(tempStr);
-			return (0);
-        }
+		{
+			splited_argv[0][0] = -12;
+			//printf("%s\n", splited_argv[0]);
+			return (splited_argv);
+		}
 	}
 	else
-		splited_argv = NULL;
-    free(tempStr);
+	{
+		splited_argv = (char **)malloc(sizeof(char *) * 2);
+		splited_argv[0] = ft_strdup(str);
+		splited_argv[1] = NULL;
+	}
 	return(splited_argv);
+}
+
+
+
+char	*ft_join2(char const *s1, char const *s2)
+{
+	char	*dest;
+	size_t	s1_len;
+	size_t	s2_len;
+
+	if (!s1 || !s2)
+		return (NULL);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	dest = (char *)malloc(sizeof(char) * (s1_len + s2_len + 1));
+	if (!dest)
+		return (NULL);
+	ft_strlcpy(dest, s1, s1_len + 1);
+	ft_strlcat(&dest[s1_len], s2, s2_len + 1);
+	free((char*)s1);
+	return (dest);
+}
+
+
+void    dequoter(char **mtrx)
+{
+    int i;
+	int len;
+    char **tempM;
+
+	len = 0;
+    i = 0;
+    while (mtrx[i])
+    {
+		if (change_caracter_q(mtrx[i]))
+		{
+			tempM = ft_split(mtrx[i], -128);
+			mtrx[i][0] = '\0';
+			while (tempM[len])
+			{
+				mtrx[i] = ft_join2(mtrx[i], tempM[len]);
+				free(tempM[len]);
+				len ++;
+			}
+			free(tempM);
+			len = 0;
+		}
+		//printf("%s\n", mtrx[i]);
+        i ++;
+    }
 }
