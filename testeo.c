@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/20 19:04:52 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/23 17:34:46 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,16 @@
 #include <signal.h>
 
 int g_error;
+
+int	ft_matrix_len(char **ptr)
+{
+	int	i;
+
+	i = 0;
+	while (ptr[i])
+		i++;
+	return (i);
+}
 
 void 	ft_print(char **str)
 {
@@ -838,6 +848,77 @@ int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
 		return (0);
 }
 
+int	ft_lastpipe(char **cmd, int *first_pipe, t_mini *mini)
+{
+	int	cpid;
+
+	cpid = fork ();
+	if (cpid == 0)
+	{
+		dup2 (*first_pipe, STDIN_FILENO);
+		close (*first_pipe);
+		ft_get_command(cmd, ft_getpath(mini->env));
+		ft_free_malloc2(cmd);
+		//execve (cmd[0], cmd, mini->env);
+	}
+	else
+	{
+		close (*first_pipe);
+		waitpid(cpid, NULL, 0);
+	}
+}
+
+int	ft_firstpipes(char **cmd, int *first_pipe, t_mini *mini)
+{
+	int	pipefd[2];
+	int	cpid;
+
+	pipe (pipefd);
+	cpid = fork ();
+	if (cpid == 0)
+	{
+		close (pipefd[0]);
+		dup2 (pipefd[1], STDOUT_FILENO);
+		close (pipefd[1]);
+		dup2 (*first_pipe, STDIN_FILENO);
+		close (*first_pipe);
+		ft_get_command(cmd, ft_getpath(mini->env));
+		ft_free_malloc2(cmd);
+	}
+	else
+	{
+		close (pipefd[1]);
+		close (*first_pipe);
+		*first_pipe = pipefd[0];
+	}
+}
+
+int	ft_pipes(t_mini *mini)
+{
+	int	first_pipe;
+	int	i;
+	int	dim;
+
+	i = 0;
+	dim = ft_matrix_len(mini->split_pipe);
+	first_pipe = dup(0);
+	while (mini->split_pipe[i])
+	{
+		if (i != 0)
+		{
+			mini->split_quote = ft_split_quotes(mini->split_pipe[i]);
+			dequoter(mini->split_quote);
+		}
+		//ft_print(mini->split_quote);
+		if ( i < dim - 1)
+			ft_firstpipes(mini->split_quote, &first_pipe, mini);
+		else if (i == dim -1)
+			ft_lastpipe(mini->split_quote, &first_pipe, mini);
+		i++;
+	}
+	
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	//const char	*src;
@@ -851,7 +932,7 @@ int	main(int argc, char **argv, char **env)
 	mini.env = ft_malloc(env, &mini);
 	i = 0;
  	g_error = 0;
-	ft_print(mini.env);
+	//ft_print(mini.env);
    	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
 	signal(SIGABRT, sighandler);
@@ -900,11 +981,18 @@ int	main(int argc, char **argv, char **env)
 			}
 			else
 			{
-				ft_print(mini.split_pipe);
-				mini.split_quote =ft_split_quotes(mini.split_pipe[0]);
+				mini.split_quote = ft_split_quotes(mini.split_pipe[0]);
+				dequoter(mini.split_quote);
+			//	printf("-------\n");
+				//ft_print(mini.split_quote);
+			//	printf("-------\n");
 				if (mini.split_quote[0][0] != -12)
 				{
-					pid = fork();
+					//dequoter(mini.split_pipe);
+					//ft_print(mini.split_quote);
+					//printf("HOLAAAAA\n");
+					ft_pipes(&mini);
+				/*	pid = fork();
 					if (pid == 0)
 					{
 						checker(ptr2, mini.split_quote, &mini);
@@ -916,6 +1004,7 @@ int	main(int argc, char **argv, char **env)
 							exit (-1);
 						waitpid(pid, NULL, 0);
 					}
+				*/
 				}
 				free(ptr);
 			}

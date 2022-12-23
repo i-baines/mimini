@@ -385,6 +385,7 @@ char	**ft_split_quotes(char *str)
 	caracter_value = change_caracter2(str);
 	if (caracter_value > 0)
 	{
+		//printf("-> %d\n", caracter_value);
 		splited_argv = ft_split(str, ' ' -128);
 		if(check_mtrx_pipe(splited_argv))
 		{

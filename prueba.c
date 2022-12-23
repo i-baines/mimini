@@ -9,19 +9,20 @@
 int main(void)
 {
     int pid[5];
+    
     int i;
 
     i = 0;
     while (i < 5)
     { 
-        pid = fork();
-		if (pid == 0)
+        pid[i] = fork();
+		if (pid[i] == 0)
 		{
 			printf("hola %d\n", i);
 			exit (-1);
 		}
 		else
-			waitpid(pid, NULL, 0);
+			waitpid(pid[i], NULL, 0);
         i++;
     }
     return (0);
