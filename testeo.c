@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/23 17:34:46 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/23 18:31:01 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ void	ft_putstr(char *str)
 
 void	ft_putstr2(char *str)
 {
-	ft_putstr("zsh: command not found: ");
+	ft_putstr("Minishell: command not found: ");
 	ft_putstr(str);
 	ft_putstr("\n");
 	ft_exit(127);
@@ -732,12 +732,49 @@ int	ft_echo(char **src, t_mini *mini)
 	}
 }
 
+int checker_inpipe(char **paths, char **src, t_mini *mini)
+{	
+	if (!ft_strncmp(src[0], "exit", 4))
+		exit (-1);
+	else if (!ft_strncmp(src[0], "env", 3))
+	{	
+		ft_env(mini);
+		exit(-1);
+	}
+	else if (!ft_strncmp(src[0], "echo", 4))
+	{	
+		ft_echo(src, mini);
+		exit(-1);
+	}
+	else if (!ft_strncmp(src[0], "export", 6))
+	{	
+		ft_export(src, mini);
+		exit(-1);
+	}
+	else if (!ft_strncmp(src[0], "unset", 5))
+	{	
+		ft_unset(src[1], mini);
+		exit(-1);
+	}
+	else if (!ft_strncmp(src[0], "cd", 2))
+	{	
+		ft_cd(src, mini);
+		exit(-1);
+	}
+	else if (!ft_strncmp(src[0], "pwd", 3))
+	{	
+		ft_printpwd();
+		exit(-1);
+	}
+	ft_get_command(src, paths);
+	return (0);
+}
+
 int checker(char **paths, char **src, t_mini *mini)
 {
 	int pid;
 	char **command;
 	
-	//command = ft_split(src, ' ');
 	if (!ft_strncmp(src[0], "exit", 4))
 		exit (-1);
 	else if (!ft_strncmp(src[0], "env", 3))
@@ -762,7 +799,6 @@ int checker(char **paths, char **src, t_mini *mini)
 	}
 	else if (!ft_strncmp(src[0], "cd", 2))
 	{	
-		//printf("S\n");
 		ft_cd(src, mini);
 		return(0);
 	}
@@ -772,15 +808,6 @@ int checker(char **paths, char **src, t_mini *mini)
 		return(0);
 	}
 	ft_get_command(src, paths);
-	/*else if (ft_strlen(src) > 0)
-	{
-		pid = fork();
-		if (pid == 0)
-		else
-		{
-			waitpid(pid, NULL, 0);
-		}
-	}*/
 	return (0);
 }
 
@@ -857,9 +884,9 @@ int	ft_lastpipe(char **cmd, int *first_pipe, t_mini *mini)
 	{
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
+		checker_inpipe(ft_getpath(mini->env), cmd, mini);
 		ft_get_command(cmd, ft_getpath(mini->env));
 		ft_free_malloc2(cmd);
-		//execve (cmd[0], cmd, mini->env);
 	}
 	else
 	{
@@ -882,6 +909,7 @@ int	ft_firstpipes(char **cmd, int *first_pipe, t_mini *mini)
 		close (pipefd[1]);
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
+		checker_inpipe(ft_getpath(mini->env), cmd, mini);
 		ft_get_command(cmd, ft_getpath(mini->env));
 		ft_free_malloc2(cmd);
 	}
