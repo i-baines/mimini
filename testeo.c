@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/23 18:31:01 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/26 19:19:44 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,17 +208,19 @@ int	ft_get_command(char **argcc, char **env)
 	int		x;
 	int		i;
 	char	*ptr;
+	char	**path;
 
 	i = 0;
-	while (env[i])
+	path = ft_getpath(env);
+	while (path[i])
 	{
-		ptr = ft_strjoin(env[i], argcc[0]);
+		ptr = ft_strjoin(path[i], argcc[0]);
 		x = access(ptr, X_OK);
 		if (x == 0)
 			execve(ptr, &argcc[0], env);
 		else
 		{
-			if (i == (ft_get_size(env) - 1))
+			if (i == (ft_get_size(path) - 1))
 				ft_putstr2(argcc[0]);
 		}
 		free(ptr);
@@ -807,7 +809,8 @@ int checker(char **paths, char **src, t_mini *mini)
 		ft_printpwd();
 		return(0);
 	}
-	ft_get_command(src, paths);
+//	printf("AAAA\n");
+	ft_get_command(src, mini->env);
 	return (0);
 }
 
@@ -852,10 +855,6 @@ char **ft_malloc(char **src, t_mini *mini)
 	return(save);
 }
 
-
-
-//void 	ft_getquote(char **str){}
-
 int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
 {
 	int	i;
@@ -863,6 +862,7 @@ int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
 	i = 0;
 	while (src[0][i])
 		i++;
+	printf("\n");
 	if (ft_strlen("cd") == i && !ft_strncmp(src[0], "cd", 2))
 		return (1);
 	if (ft_strlen("unset") == i && !ft_strncmp(src[0], "unset", 5))
@@ -884,8 +884,8 @@ int	ft_lastpipe(char **cmd, int *first_pipe, t_mini *mini)
 	{
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
-		checker_inpipe(ft_getpath(mini->env), cmd, mini);
-		ft_get_command(cmd, ft_getpath(mini->env));
+		checker_inpipe(mini->env, cmd, mini);
+		ft_get_command(cmd, mini->env);
 		ft_free_malloc2(cmd);
 	}
 	else
@@ -909,8 +909,8 @@ int	ft_firstpipes(char **cmd, int *first_pipe, t_mini *mini)
 		close (pipefd[1]);
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
-		checker_inpipe(ft_getpath(mini->env), cmd, mini);
-		ft_get_command(cmd, ft_getpath(mini->env));
+		checker_inpipe(mini->env, cmd, mini);
+		ft_get_command(cmd, mini->env);
 		ft_free_malloc2(cmd);
 	}
 	else
@@ -937,7 +937,6 @@ int	ft_pipes(t_mini *mini)
 			mini->split_quote = ft_split_quotes(mini->split_pipe[i]);
 			dequoter(mini->split_quote);
 		}
-		//ft_print(mini->split_quote);
 		if ( i < dim - 1)
 			ft_firstpipes(mini->split_quote, &first_pipe, mini);
 		else if (i == dim -1)
@@ -949,7 +948,6 @@ int	ft_pipes(t_mini *mini)
 
 int	main(int argc, char **argv, char **env)
 {
-	//const char	*src;
 	char		*ptr;
 	char		**ptr2;
 	char		**splited_argv;
@@ -960,7 +958,6 @@ int	main(int argc, char **argv, char **env)
 	mini.env = ft_malloc(env, &mini);
 	i = 0;
  	g_error = 0;
-	//ft_print(mini.env);
    	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler);
 	signal(SIGABRT, sighandler);
@@ -1003,7 +1000,10 @@ int	main(int argc, char **argv, char **env)
 						}
 					}
 					else
+					{
+				//		printf("BBB\n");
 						checker(ptr2, mini.split_quote, &mini);		
+					}
 				}
 				
 			}
@@ -1011,29 +1011,8 @@ int	main(int argc, char **argv, char **env)
 			{
 				mini.split_quote = ft_split_quotes(mini.split_pipe[0]);
 				dequoter(mini.split_quote);
-			//	printf("-------\n");
-				//ft_print(mini.split_quote);
-			//	printf("-------\n");
 				if (mini.split_quote[0][0] != -12)
-				{
-					//dequoter(mini.split_pipe);
-					//ft_print(mini.split_quote);
-					//printf("HOLAAAAA\n");
 					ft_pipes(&mini);
-				/*	pid = fork();
-					if (pid == 0)
-					{
-						checker(ptr2, mini.split_quote, &mini);
-						exit (-1);
-					}
-					else
-					{
-						if (!ft_strncmp(ptr, "exit", 4))
-							exit (-1);
-						waitpid(pid, NULL, 0);
-					}
-				*/
-				}
 				free(ptr);
 			}
 		}

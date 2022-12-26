@@ -13,6 +13,7 @@ int     open_quotes(char *str);
 char	**ft_split_pipes(char *str);
 char	**ft_split_quotes(char *str);
 void	dequoter(char **mtrx);
+char	**ft_getpath(char **env);
 
 typedef struct s_env
 {
