@@ -65,14 +65,12 @@ int open_quotes(char *str)
 	return(check);
 }
 
-int change_caracter(char *str, char caracter)
+void change_caracter(char *str, char caracter)
 {
 	int		i;
 	int		check;
 	char	quote;
-	int		pipes;
 
-	pipes = 0;
 	i = 0;
 	check = 1;
 	quote = 'x';
@@ -91,18 +89,10 @@ int change_caracter(char *str, char caracter)
 		if (check == 1)
 			quote = 'x';
 		if (str[i] == caracter && quote == 'x')
-		{
-			if (str[i + 1] == caracter)
-			{
-				printf("Minishell: Syntax error\n");
-				return (-1);
-			}
-			pipes ++;
 			str[i] = caracter -128;
-		}
 		i ++;
 	}
-	return(pipes);
+	return ;
 }
 
 int change_caracter2(char *str)
@@ -350,28 +340,18 @@ char	*ft_replace(char *str, char caracter)
 
 char	**ft_split_pipes(char *str)
 {
-	int caracter_value;
 	char **splited_argv;
     char *tempStr;
 
     tempStr = ft_strdup(str);
-	caracter_value = change_caracter(tempStr, '|');
-	if (caracter_value < 0)
-    {
-        free(tempStr);
-    	return (0);
-    }
-	else if (caracter_value > 0)
+	change_caracter(tempStr, '|');
+	splited_argv = ft_split(tempStr, '|' -128);
+	if(check_mtrx_pipe(splited_argv))
 	{
-		splited_argv = ft_split(tempStr, '|' -128);
-		if(check_mtrx_pipe(splited_argv))
-        {
-            free(tempStr);
-    	    return (splited_argv);
-        }
+		free(tempStr);
+		splited_argv[0][0] = -12;
+		return (splited_argv);
 	}
-	else
-		splited_argv = NULL;
     free(tempStr);
 	return(splited_argv);
 }

@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/26 19:19:44 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/27 17:53:35 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,46 @@ void	ft_exit(int num)
 {
 	g_error = num;
 }
+void sighandler3(int signum)
+{
+	char c;
+
+	c = 127;
+
+	if (signum == SIGINT)
+   {  
+		//write(1, &c, 1);
+		//rl_on_new_line();
+		write(1, "^C\n", 3);
+		rl_replace_line("", 1);
+		rl_redisplay();
+}
+}
+
+void sighandler_quit(int signum)
+{
+
+	if (signum == SIGQUIT)
+   {  
+		//write(1, &c, 1);
+		write(1, "\n", 1);
+		//rl_on_new_line();
+		rl_replace_line("", 1);
+		rl_redisplay();
+}
+}
 
 void sighandler(int signum)
 {
 	char c;
 
 	c = 127;
-	//printf("%d\n", signum);
-    if (signum == 2)
+
+	if (signum == SIGINT)
    {  
 		//write(1, &c, 1);
-		rl_on_new_line();
 		write(1, "\n", 1);
+		//rl_on_new_line();
 		rl_replace_line("", 1);
 		rl_redisplay();
 }
@@ -862,7 +890,7 @@ int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
 	i = 0;
 	while (src[0][i])
 		i++;
-	printf("\n");
+	//printf("\n");
 	if (ft_strlen("cd") == i && !ft_strncmp(src[0], "cd", 2))
 		return (1);
 	if (ft_strlen("unset") == i && !ft_strncmp(src[0], "unset", 5))
@@ -955,12 +983,12 @@ int	main(int argc, char **argv, char **env)
 	int i;
 	int	pid; ///
 
+   	signal(SIGINT, sighandler);
+	signal(SIGQUIT, sighandler_quit);
+	signal(SIGABRT, sighandler);
 	mini.env = ft_malloc(env, &mini);
 	i = 0;
  	g_error = 0;
-   	signal(SIGINT, sighandler);
-	signal(SIGQUIT, sighandler);
-	signal(SIGABRT, sighandler);
 	i = 0;
 	ptr2 = ft_getpath(env);
 	argv[1] = NULL;
@@ -978,42 +1006,58 @@ int	main(int argc, char **argv, char **env)
 		else
 		{
 			mini.split_pipe  = ft_split_pipes(ptr);
-			if (!mini.split_pipe)
+			if (mini.split_pipe[0][0] != -12)
 			{
-				mini.split_quote = ft_split_quotes(ptr);
-				if (mini.split_quote[0][0] != -12)
+				if (!mini.split_pipe[1])
 				{
-					dequoter(mini.split_quote);
-					if (!ft_checkcom(mini.split_quote))
+					mini.split_quote = ft_split_quotes(ptr);
+					if (mini.split_quote[0][0] != -12)
 					{
-						pid = fork();
-						if (pid == 0)
+						dequoter(mini.split_quote);
+						if (!ft_checkcom(mini.split_quote))
 						{
-							checker(ptr2, mini.split_quote, &mini);
-							exit (-1);
+							printf("BBB\n");
+							//signal(SIGINT, sighandler3);
+							pid = fork();
+							if (pid == 0)
+							{
+								checker(ptr2, mini.split_quote, &mini);
+								exit (-1);
+							}
+							else
+							{
+								if (!ft_strncmp(ptr, "exit", 4))
+									exit (-1);
+								waitpid(pid, NULL, 0);
+								if (mini.split_quote)
+								{
+									free(mini.split_quote);
+									mini.split_quote = NULL;
+									//printf("**************\n");
+								}
+							}
 						}
 						else
 						{
-							if (!ft_strncmp(ptr, "exit", 4))
-								exit (-1);
-							waitpid(pid, NULL, 0);
+							//printf("BBB\n");
+							checker(ptr2, mini.split_quote, &mini);	
+							if (mini.split_quote)
+							{
+								free(mini.split_quote);
+								mini.split_quote = NULL;
+								printf("**************\n");
+							}
 						}
-					}
-					else
-					{
-				//		printf("BBB\n");
-						checker(ptr2, mini.split_quote, &mini);		
-					}
+					}	
 				}
-				
-			}
-			else
-			{
-				mini.split_quote = ft_split_quotes(mini.split_pipe[0]);
-				dequoter(mini.split_quote);
-				if (mini.split_quote[0][0] != -12)
-					ft_pipes(&mini);
-				free(ptr);
+				else
+				{
+					mini.split_quote = ft_split_quotes(mini.split_pipe[0]);
+					dequoter(mini.split_quote);
+					if (mini.split_quote[0][0] != -12)
+						ft_pipes(&mini);
+					free(ptr);
+				}
 			}
 		}
 	}
