@@ -2,7 +2,7 @@ NAME= Minishell
 CC= gcc
 CFLAGS= -Wall -Wextra -Werror -g3
 CFLAGS= 
-SANITIZE= -fsanitize=address
+#SANITIZE= -fsanitize=address
 RM= rm -rf
 FILES= 	testeo \
 		ft_strncmp \

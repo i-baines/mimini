@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/27 17:53:35 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/28 12:39:53 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -754,7 +754,10 @@ int	ft_echo(char **src, t_mini *mini)
 		{
 			while (src[i])
 			{
-				printf("%s ", src[i]);	
+				if (src[i + 1])
+					printf("%s ", src[i]);	
+				else
+					printf("%s", src[i]);	
 				i++;
 			}
 			printf("\n");
@@ -764,34 +767,34 @@ int	ft_echo(char **src, t_mini *mini)
 
 int checker_inpipe(char **paths, char **src, t_mini *mini)
 {	
-	if (!ft_strncmp(src[0], "exit", 4))
+	if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "exit", 4))
 		exit (-1);
-	else if (!ft_strncmp(src[0], "env", 3))
+	else if (ft_strlen(src[0]) == 3 && !ft_strncmp(src[0], "env", 3))
 	{	
 		ft_env(mini);
 		exit(-1);
 	}
-	else if (!ft_strncmp(src[0], "echo", 4))
+	else if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "echo", 4))
 	{	
 		ft_echo(src, mini);
 		exit(-1);
 	}
-	else if (!ft_strncmp(src[0], "export", 6))
+	else if (ft_strlen(src[0]) == 6 && !ft_strncmp(src[0], "export", 6))
 	{	
 		ft_export(src, mini);
 		exit(-1);
 	}
-	else if (!ft_strncmp(src[0], "unset", 5))
+	else if (ft_strlen(src[0]) == 5 && !ft_strncmp(src[0], "unset", 5))
 	{	
 		ft_unset(src[1], mini);
 		exit(-1);
 	}
-	else if (!ft_strncmp(src[0], "cd", 2))
+	else if (ft_strlen(src[0]) == 2 && !ft_strncmp(src[0], "cd", 2))
 	{	
 		ft_cd(src, mini);
 		exit(-1);
 	}
-	else if (!ft_strncmp(src[0], "pwd", 3))
+	else if (ft_strlen(src[0]) == 3 && !ft_strncmp(src[0], "pwd", 3))
 	{	
 		ft_printpwd();
 		exit(-1);
@@ -805,34 +808,34 @@ int checker(char **paths, char **src, t_mini *mini)
 	int pid;
 	char **command;
 	
-	if (!ft_strncmp(src[0], "exit", 4))
+	if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "exit", 4))
 		exit (-1);
-	else if (!ft_strncmp(src[0], "env", 3))
+	else if (ft_strlen(src[0]) == 3 && !ft_strncmp(src[0], "env", 3))
 	{	
 		ft_env(mini);
 		return(0);
 	}
-	else if (!ft_strncmp(src[0], "echo", 4))
+	else if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "echo", 4))
 	{	
 		ft_echo(src, mini);
 		return(0);
 	}
-	else if (!ft_strncmp(src[0], "export", 6))
+	else if (ft_strlen(src[0]) == 6 && !ft_strncmp(src[0], "export", 6))
 	{	
 		ft_export(src, mini);
 		return(0);
 	}
-	else if (!ft_strncmp(src[0], "unset", 5))
+	else if (ft_strlen(src[0]) == 5 && !ft_strncmp(src[0], "unset", 5))
 	{	
 		ft_unset(src[1], mini);
 		return(0);
 	}
-	else if (!ft_strncmp(src[0], "cd", 2))
+	else if (ft_strlen(src[0]) == 2 && !ft_strncmp(src[0], "cd", 2))
 	{	
 		ft_cd(src, mini);
 		return(0);
 	}
-	else if (!ft_strncmp(src[0], "pwd", 3))
+	else if (ft_strlen(src[0]) == 3 && !ft_strncmp(src[0], "pwd", 3))
 	{	
 		ft_printpwd();
 		return(0);
@@ -940,6 +943,7 @@ int	ft_firstpipes(char **cmd, int *first_pipe, t_mini *mini)
 		checker_inpipe(mini->env, cmd, mini);
 		ft_get_command(cmd, mini->env);
 		ft_free_malloc2(cmd);
+		cmd = NULL;
 	}
 	else
 	{
@@ -971,7 +975,19 @@ int	ft_pipes(t_mini *mini)
 			ft_lastpipe(mini->split_quote, &first_pipe, mini);
 		i++;
 	}
-	
+	ft_free_malloc2(mini->split_pipe);
+	mini->split_pipe = NULL;
+}
+
+void	ft_freeall(t_mini *mini)
+{
+	if (mini->split_pipe)
+		ft_free_malloc2(mini->split_pipe);
+	printf("a\n");
+	if (mini->split_quote)
+		ft_free_malloc2(mini->split_quote);
+	ft_free_malloc2(mini->env);
+	exit(1);
 }
 
 int	main(int argc, char **argv, char **env)
@@ -980,8 +996,8 @@ int	main(int argc, char **argv, char **env)
 	char		**ptr2;
 	char		**splited_argv;
 	t_mini 		mini;
-	int i;
-	int	pid; ///
+	int			i;
+	int			pid; ///
 
    	signal(SIGINT, sighandler);
 	signal(SIGQUIT, sighandler_quit);
@@ -990,6 +1006,8 @@ int	main(int argc, char **argv, char **env)
 	i = 0;
  	g_error = 0;
 	i = 0;
+	mini.split_pipe = NULL;
+	mini.split_quote = NULL;
 	ptr2 = ft_getpath(env);
 	argv[1] = NULL;
 	i = argc;
@@ -997,13 +1015,13 @@ int	main(int argc, char **argv, char **env)
 	while (1) // separar comandos que hace el padre a los hijos
 	{
 		ptr = readline(BOLD "Minishell $> " CLOSE);
-		if (ptr == NULL)
-			return(-1);
+		if (ptr == NULL) //todo: llamar a una funcion para liberar todo lo que haya, ctrl + d
+			ft_freeall(&mini);
 		if (ft_strlen(ptr))
 			add_history(ptr);
 		if (open_quotes(ptr) < 0)
 			printf("Minishell: Syntax error\n");
-		else
+		else if (ft_strlen(ptr) > 0)
 		{
 			mini.split_pipe  = ft_split_pipes(ptr);
 			if (mini.split_pipe[0][0] != -12)
@@ -1014,10 +1032,11 @@ int	main(int argc, char **argv, char **env)
 					if (mini.split_quote[0][0] != -12)
 					{
 						dequoter(mini.split_quote);
+							ft_free_malloc2(mini.split_pipe);
+							mini.split_pipe = NULL;
+							free(ptr);
 						if (!ft_checkcom(mini.split_quote))
 						{
-							printf("BBB\n");
-							//signal(SIGINT, sighandler3);
 							pid = fork();
 							if (pid == 0)
 							{
@@ -1026,26 +1045,23 @@ int	main(int argc, char **argv, char **env)
 							}
 							else
 							{
-								if (!ft_strncmp(ptr, "exit", 4))
+								if (!ft_strncmp(mini.split_quote[0], "exit", 4))
 									exit (-1);
 								waitpid(pid, NULL, 0);
 								if (mini.split_quote)
 								{
-									free(mini.split_quote);
+									ft_free_malloc2(mini.split_quote);
 									mini.split_quote = NULL;
-									//printf("**************\n");
 								}
 							}
 						}
 						else
 						{
-							//printf("BBB\n");
 							checker(ptr2, mini.split_quote, &mini);	
 							if (mini.split_quote)
 							{
-								free(mini.split_quote);
+								ft_free_malloc2(mini.split_quote);
 								mini.split_quote = NULL;
-								printf("**************\n");
 							}
 						}
 					}	
