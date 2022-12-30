@@ -1,12 +1,36 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/12/30 12:59:40 by ibaines           #+#    #+#              #
+#    Updated: 2022/12/30 12:59:41 by ibaines          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME= Minishell
 CC= gcc
 CFLAGS= -Wall -Wextra -Werror -g3
 CFLAGS= 
-#SANITIZE= -fsanitize=address
+SANITIZE= -fsanitize=address
 RM= rm -rf
 FILES= 	testeo \
 		ft_strncmp \
-		utils
+		utils \
+		pipes \
+		pipe_com \
+		pipe_com2 \
+		signals \
+		builtin \
+		builtin2 \
+		export \
+		unset \
+		built_utils \
+		com_check \
+		malloc_free \
+
 
 LIBFT = libftt/libft.a
 
