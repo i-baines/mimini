@@ -6,13 +6,13 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:56:16 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:56:17 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/30 18:11:57 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int checker_inpipe(char **paths, char **src, t_mini *mini)//cambiar exit por return para liberar
+int checker_inpipe(char **paths, char **src, t_mini *mini)
 {	
 	if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "exit", 4))
 		exit (-1);
@@ -63,6 +63,7 @@ int checker_inpipe(char **paths, char **src, t_mini *mini)//cambiar exit por ret
 int	ft_lastpipe(char **cmd, int *first_pipe, t_mini *mini)
 {
 	int	cpid;
+	int	status;
 
 	cpid = fork ();
 	if (cpid == 0)
@@ -70,12 +71,12 @@ int	ft_lastpipe(char **cmd, int *first_pipe, t_mini *mini)
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
 		checker_inpipe(mini->env, cmd, mini);
-		//ft_get_command(cmd, mini->env);
-		//ft_free_malloc2(cmd);
 	}
 	else
 	{
 		close (*first_pipe);
+		if (WIFEXITED(status))
+			g_error = WEXITSTATUS(status);
 		waitpid(cpid, NULL, 0);
 	}
 }
@@ -95,9 +96,6 @@ int	ft_firstpipes(char **cmd, int *first_pipe, t_mini *mini)
 		dup2 (*first_pipe, STDIN_FILENO);
 		close (*first_pipe);
 		checker_inpipe(mini->env, cmd, mini);
-		//ft_get_command(cmd, mini->env);
-		//ft_free_malloc2(cmd);
-		//cmd = NULL;
 	}
 	else
 	{

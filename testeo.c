@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/29 11:01:19 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 12:11:21 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #define CLOSE	"\001\033[0m\002"
 #include <signal.h>
 
-int g_error;
+
 
 int	ft_matrix_len(char **ptr)
 {
@@ -66,6 +66,7 @@ int	main(int argc, char **argv, char **env)
 	char		**splited_argv;
 	t_mini 		mini;
 	int			i;
+	int			status;
 	int			pid; ///
 
    	signal(SIGINT, sighandler);
@@ -101,10 +102,10 @@ int	main(int argc, char **argv, char **env)
 					if (mini.split_quote[0][0] != -12)
 					{
 						dequoter(mini.split_quote);
-							ft_free_malloc2(mini.split_pipe);
-							mini.split_pipe = NULL;
-							free(ptr);
-						if (!ft_checkcom(mini.split_quote))
+						ft_free_malloc2(mini.split_pipe);
+						mini.split_pipe = NULL;
+						free(ptr);
+						if (!ft_checkcom(mini.split_quote))//comandos que puede hacer el hijo
 						{
 							pid = fork();
 							if (pid == 0)
@@ -114,9 +115,11 @@ int	main(int argc, char **argv, char **env)
 							}
 							else
 							{
-								if (!ft_strncmp(mini.split_quote[0], "exit", 4))
-									exit (-1);
-								waitpid(pid, NULL, 0);
+								if (WIFEXITED(status))
+									g_error = WEXITSTATUS(status);
+								//if (!ft_strncmp(mini.split_quote[0], "exit", 4))
+								//	exit (-1);
+								waitpid(pid, &status, 0);
 								if (mini.split_quote)
 								{
 									ft_free_malloc2(mini.split_quote);
@@ -124,7 +127,7 @@ int	main(int argc, char **argv, char **env)
 								}
 							}
 						}
-						else
+						else //comandos que necesitan padre
 						{
 							checker(ptr2, mini.split_quote, &mini);	
 							if (mini.split_quote)
@@ -145,6 +148,7 @@ int	main(int argc, char **argv, char **env)
 				}
 			}
 		}
+		printf("exit = %d\n", g_error);
 	}
 	ft_free_malloc2(mini.env);
 	return (0);

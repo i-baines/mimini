@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:55:24 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:55:25 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 12:22:27 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,32 +14,56 @@
 
 int	ft_one_com(char **cmd, t_mini *mini)
 {
-	int	first_pipe;
+	/*int	first_pipe;
 
 	first_pipe = 0;
 	if (ft_matrix_len(cmd) == 1)
 	{
-	printf("dim = %d\n", ft_matrix_len(cmd));
+		printf("dim = %d\n", ft_matrix_len(cmd));
 		first_pipe = dup(0);
 		dup2 (first_pipe, STDIN_FILENO);
-		//close (first_pipe);
-
-	}
-		//checker_inpipe(mini->env, cmd, mini);
-		//ft_get_command(cmd, mini->env);
-		//ft_free_malloc2(cmd);
+	}*/
 		ft_get_command(cmd, mini->env);
-		close (first_pipe);
+	//	close (first_pipe);
+}
+
+int	my_exit(char **src, t_mini *mini)
+{
+	int i;
+	int	j;
+
+	i = 0;
+	j = 1;
+	if (ft_matrix_len(src) <= 2)
+	{
+		while (src[j][i])
+		{
+			if (!ft_isdigit(src[j][i]) && src[j][i] != ' ')
+			{
+				printf("exit\nMinishell: exit: %s: numeric argument required\n", src[j]);
+				g_error = 255;
+				exit(0);
+			}
+			i++;
+		}
+		i = 0;
+		//j++;
+		printf("num = %s\n",src[j]);
+		//printf("num = %d\n",ft_atoi(src[j]));
+		g_error = ft_atoi(src[j]);
+		exit(0);
+	}
+	printf("exit\nMinishell: exit: too many arguments\n");
+	g_error = 1;
 }
 
 int checker(char **paths, char **src, t_mini *mini)
 {
 	int pid;
 	char **command;
-	//if (paths)
-	//	ft_free_malloc2(paths);
+
 	if (ft_strlen(src[0]) == 4 && !ft_strncmp(src[0], "exit", 4))
-		exit (-1);
+		my_exit(src, mini);
 	else if (ft_strlen(src[0]) == 3 && !ft_strncmp(src[0], "env", 3))
 	{	
 		ft_env(mini);
@@ -70,11 +94,12 @@ int checker(char **paths, char **src, t_mini *mini)
 		ft_printpwd();
 		return(0);
 	}
+	printf("******\n");
 	ft_one_com(src, mini);
 	return (0);
 }
 
-int	ft_checkcom(char **src) // comprobar comandos cd, unset, export, exit
+int	ft_checkcom(char **src)
 {
 	int	i;
 

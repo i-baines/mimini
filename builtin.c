@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:55:29 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:55:30 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 10:58:16 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ char	*ft_pwd(void)
 		printf("Error getcwd\n");
 		return (NULL);
 	}
-	//printf("%s\n", tmp);
 	dir = ft_strdup(tmp);
 	return (dir);
 }
@@ -48,6 +47,7 @@ int	ft_echo(char **src, t_mini *mini)
 	flag = 0;
 	i = 1;
 	dim = 0;
+	printf("exit entrada = %d\n", g_error);
 	while (src[dim])
 		dim++;
 	if (dim >= 2)
@@ -91,4 +91,5 @@ void	ft_env(t_mini *mini)
 			printf("%s\n", mini->env[i]);
 		i++;
 	}
+	
 }

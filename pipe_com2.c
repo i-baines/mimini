@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:55:08 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:55:09 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/30 13:29:21 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,11 @@ int	ft_get_command(char **argcc, char **env)
 		y = access(argcc[0], X_OK);
 		if (x == 0 || y == 0)
 		{
-			printf("aaaaaaa=%s\n", argcc[0]);
 			ft_free_malloc2(path);
 			path = NULL;
 			if (y == 0)
-				execve(argcc[0], &argcc[0], env);
-			execve(ptr, &argcc[0], env);
+				ft_exit(execve(argcc[0], &argcc[0], env));
+			ft_exit(execve(ptr, &argcc[0], env));
 		}
 		else
 		{
@@ -71,7 +70,7 @@ int	ft_get_command(char **argcc, char **env)
 	}
 	if (path)
 		ft_free_malloc2(path);
-	if (!path) // igual hay que liberar el path
+	if (!path)
 		exit (-1);
 	path = NULL;
 	return (0);

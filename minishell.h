@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:59:33 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:59:34 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/30 17:52:33 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include "libftt/libft.h"
 #include <string.h>
+
+int g_error;
 
 typedef struct s_env
 {

@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:55:54 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 12:55:55 by ibaines          ###   ########.fr       */
+/*   Updated: 2022/12/30 13:03:20 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ int	ft_cd_swap(char *str, t_mini *mini)
 	{
 		if (ft_strncmp("PWD", mini->env[i], ft_check_var2("PWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("PWD")))
 		{	
-			ptr = mini->env[i];//ahora antiguo
-			mini->env[i] = ft_strjoin("PWD=", str); // juntar  
+			ptr = mini->env[i];
+			mini->env[i] = ft_strjoin("PWD=", str);
 		}
 		if (ft_strncmp("OLDPWD", mini->env[i], ft_check_var2("OLDPWD")) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export("OLDPWD")))
 		{	
@@ -68,10 +68,7 @@ int	ft_cd_find(char *str, t_mini *mini)
 	while (mini->env[i] && i < mini->env_len - 1)
 	{
 		if (ft_strncmp(str, mini->env[i], ft_check_var2(str)) == 0 && (ft_strlen_export(mini->env[i]) == ft_strlen_export(str)))
-		{
-			//printf("i = %d\n");
 			return (i);
-		}
 		i++;
 	}
 	return(0);
