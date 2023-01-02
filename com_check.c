@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:55:24 by ibaines           #+#    #+#             */
-/*   Updated: 2023/01/02 12:22:27 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 18:32:59 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,27 @@ int	ft_one_com(char **cmd, t_mini *mini)
 		first_pipe = dup(0);
 		dup2 (first_pipe, STDIN_FILENO);
 	}*/
-		ft_get_command(cmd, mini->env);
+	ft_get_command(cmd, mini->env);
 	//	close (first_pipe);
+}
+
+int	ft_get_exit(char **src)
+{
+	long long int	num;
+	int				div;
+	int				ex;
+
+	num = ft_atoi(src[1]);
+	if (num > 255)
+	{
+		ex = num % 256;
+		//div = num / 255;
+		printf("div = %d / ex = %d\n", div, ex);
+		ex = ex - div;
+	}
+	else
+		ex = num;
+	return (ex);
 }
 
 int	my_exit(char **src, t_mini *mini)
@@ -50,7 +69,14 @@ int	my_exit(char **src, t_mini *mini)
 		//j++;
 		printf("num = %s\n",src[j]);
 		//printf("num = %d\n",ft_atoi(src[j]));
-		g_error = ft_atoi(src[j]);
+		g_error = ft_get_exit(src);
+		printf("error = %d\n", g_error);
+		/*if (g_error > 255)
+		{
+			printf("***********\n");
+			g_error = g_error - 1;
+		}
+		printf("error = %d\n", g_error);*/
 		exit(0);
 	}
 	printf("exit\nMinishell: exit: too many arguments\n");

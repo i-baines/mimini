@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/30 12:59:33 by ibaines           #+#    #+#             */
-/*   Updated: 2022/12/30 17:52:33 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 19:35:51 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	ft_unset(char **src, t_mini *mini);
 void	ft_env(t_mini *mini);
 int	ft_checkcom(char **src);
 int checker(char **paths, char **src, t_mini *mini);
+char	**dolar_expand(char **mtrx, char **env);
 
 
 

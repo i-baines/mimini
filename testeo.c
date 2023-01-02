@@ -6,7 +6,7 @@
 /*   By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 18:14:39 by ibaines           #+#    #+#             */
-/*   Updated: 2023/01/02 12:11:21 by ibaines          ###   ########.fr       */
+/*   Updated: 2023/01/02 19:48:27 by ibaines          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ int	main(int argc, char **argv, char **env)
 				if (!mini.split_pipe[1])
 				{
 					mini.split_quote = ft_split_quotes(ptr);
+					mini.split_quote = dolar_expand(mini.split_quote, mini.env);
 					if (mini.split_quote[0][0] != -12)
 					{
 						dequoter(mini.split_quote);
@@ -141,6 +142,7 @@ int	main(int argc, char **argv, char **env)
 				else
 				{
 					mini.split_quote = ft_split_quotes(mini.split_pipe[0]);
+					mini.split_quote = dolar_expand(mini.split_quote, mini.env);
 					dequoter(mini.split_quote);
 					if (mini.split_quote[0][0] != -12)
 						ft_pipes(&mini);

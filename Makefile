@@ -6,7 +6,7 @@
 #    By: ibaines <ibaines@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/12/30 12:59:40 by ibaines           #+#    #+#              #
-#    Updated: 2022/12/30 12:59:41 by ibaines          ###   ########.fr        #
+#    Updated: 2023/01/02 19:43:20 by ibaines          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,6 +30,7 @@ FILES= 	testeo \
 		built_utils \
 		com_check \
 		malloc_free \
+		dolar_expand \
 
 
 LIBFT = libftt/libft.a
