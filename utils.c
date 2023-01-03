@@ -112,97 +112,93 @@ void	change_caracter(char *str, char caracter)
 	return ;
 }
 
+void	ft_init_help(t_help *v)
+{
+	v->pipes = 0;
+	v->check = 1;
+	v->quote = 'x';
+}
+
 int	change_caracter2(char *str)
 {
-	int		check;
-	char	quote;
-	int		pipes;
+	t_help	v;
 
-	pipes = 0;
-	check = 1;
-	quote = 'x';
-	while (*str)
+	ft_init_help(&v);
+	while (*str++)
 	{
-		if (*str == '\'' && quote != 'd')
+		if (*(str - 1) == '\'' && v.quote != 'd')
 		{
-			quote = 's';
-			check = check * -1;
+			v.quote = 's';
+			v.check = v.check * -1;
 		}
-		else if (*str == '\"' && quote != 's')
+		else if (*(str - 1) == '\"' && v.quote != 's')
 		{
-			quote = 'd';
-			check = check * -1;
+			v.quote = 'd';
+			v.check = v.check * -1;
 		}
-		if (check == 1)
-			quote = 'x';
-		if (*str == ' ' && quote == 'x')
+		if (v.check == 1)
+			v.quote = 'x';
+		if (*(str - 1) == ' ' && v.quote == 'x')
 		{
-			pipes ++;
-			*str = ' ' -128;
+			v.pipes ++;
+			*(str - 1) = ' ' -128;
 		}
-		str++;
 	}
-	return (pipes);
+	return (v.pipes);
 }
 
 int	change_caracter_q(char *str)
 {
-	int		check;
-	char	quote;
-	int		num;
+	t_help	v;
 
-	num = 0;
-	check = 1;
-	quote = 'x';
-	while (*str)
+	v.num = 0;
+	v.check = 1;
+	v.quote = 'x';
+	while (*str++)
 	{
-		if (*str == '\'' && quote != 'd')
+		if (*(str - 1) == '\'' && v.quote != 'd')
 		{
-			num ++;
-			quote = 's';
-			check = check * -1;
-			*str = -128;
+			v.num ++;
+			v.quote = 's';
+			v.check = v.check * -1;
+			*(str - 1) = -128;
 		}
-		else if (*str == '\"' && quote != 's')
+		else if (*(str - 1) == '\"' && v.quote != 's')
 		{
-			num ++;
-			quote = 'd';
-			check = check * -1;
-			*str = -128;
+			v.num ++;
+			v.quote = 'd';
+			v.check = v.check * -1;
+			*(str - 1) = -128;
 		}
-		if (check == 1)
-			quote = 'x';
-		str++;
+		if (v.check == 1)
+			v.quote = 'x';
 	}
-	return (num / 2);
+	return (v.num / 2);
 }
 
 int	check_mtrx_pipe(char **mtrx)
 {
-	int	i;
-	int	j;
-	int	flag;
-	int	word;
+	t_help	v;
 
-	word = 0;
-	flag = 0;
-	j = 0;
-	i = 0;
-	while (mtrx[i])
+	v.word = 0;
+	v.flag = 0;
+	v.j = 0;
+	v.i = 0;
+	while (mtrx[v.i])
 	{
-		while (mtrx[i][j])
+		while (mtrx[v.i][v.j])
 		{
-			if (mtrx[i][j] > 32)
-				flag = 1;
-			j ++;
+			if (mtrx[v.i][v.j] > 32)
+				v.flag = 1;
+			v.j ++;
 		}
-		if (flag == 1)
-			word ++;
-		flag = 0;
-		j = 0;
-		i ++;
+		if (v.flag == 1)
+			v.word ++;
+		v.flag = 0;
+		v.j = 0;
+		v.i ++;
 	}
-	if (word == i)
+	if (v.word == v.i)
 		return (0);
 	printf("Minishell: Syntax error\n");
 	return (1);

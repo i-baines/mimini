@@ -24,19 +24,31 @@ int g_error;
 
 typedef struct s_env
 {
-    char *str;
-    struct s_env *next;
+	char *str;
+	struct s_env *next;
 }       t_env;
 
 typedef struct s_mini
 {
-    int pid_id;
-    char **env;
-    char    **split_pipe;
-    char    **split_quote;
-    t_env *env_new;
-    int env_len;
+	int pid_id;
+	char **env;
+	char    **split_pipe;
+	char    **split_quote;
+	t_env *env_new;
+	int env_len;
 }   t_mini ;
+
+typedef struct s_help
+{
+	int		i;
+	int		j;
+	int		flag;
+	int		word;
+	int		check;
+	char	quote;
+	int		num;
+	int		pipes;
+}   t_help;
 
 
 int     ft_strncmp(const char *s1, const char *s2, size_t n);
