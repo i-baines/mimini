@@ -17,7 +17,7 @@
 #include <readline/history.h>
 #define BOLD	"\001\033[1m\002"
 #define CLOSE	"\001\033[0m\002"
-#include <signal.h>
+#include <signal.h> 
 
 
 
