@@ -12,26 +12,11 @@
 
 #include "minishell.h"
 
-int open_pipes(char *str)
+int	open_pipes2(char *str)
 {
-	int		i;
+	int	i;
 
 	i = 0;
-	while (str[i])
-		i ++;
-	if (i > 0 && (str[0] == '|' || str[i - 1] == '|'))
-		return(0);
-	i = 0;
-    if (str[i] == ' ')
-    {
-        while (str[i] == ' ')
-        {
-            i ++;
-            if (str[i] == '|')
-                return(0);
-        }
-    }
-    i = 0;
 	while (str[i])
 	{
 		if (str[i] == '|')
@@ -41,147 +26,163 @@ int open_pipes(char *str)
 				i ++;
 		}
 		if (!str[i])
-			return(0);
+			return (0);
 		i ++;
 	}
-	return(1);
+	return (1);
 }
 
-int open_quotes(char *str)
+int	open_pipes(char *str)
 {
 	int		i;
+
+	i = 0;
+	while (str[i])
+		i ++;
+	if (i > 0 && (str[0] == '|' || str[i - 1] == '|'))
+		return (0);
+	i = 0;
+	if (str[i] == ' ')
+	{
+		while (str[i] == ' ')
+		{
+			i ++;
+			if (str[i] == '|')
+				return (0);
+		}
+	}
+	if (!open_pipes2(str))
+		return (0);
+	return (1);
+}
+
+int	open_quotes(char *str)
+{
 	int		check;
 	char	quote;
 
-	i = 0;
 	check = 1;
 	quote = 'x';
-	while (str[i])
-	{
-		if (str[i] == '\'' && quote != 'd')
-		{
-			quote = 's';
-			check = check * -1;
-		}
-		else if (str[i] == '\"' && quote != 's')
-		{
-			quote = 'd';
-			check = check * -1;
-		}
-		if (check == 1)
-			quote = 'x';
-		i ++;
-	}
 	if (!open_pipes(str))
-		return(-1);
-	return(check);
-}
-
-void change_caracter(char *str, char caracter)
-{
-	int		i;
-	int		check;
-	char	quote;
-
-	i = 0;
-	check = 1;
-	quote = 'x';
-	while (str[i])
+		return (-1);
+	while (*str)
 	{
-		if (str[i] == '\'' && quote != 'd')
+		if (*str == '\'' && quote != 'd')
 		{
 			quote = 's';
 			check = check * -1;
 		}
-		else if (str[i] == '\"' && quote != 's')
+		else if (*str == '\"' && quote != 's')
 		{
 			quote = 'd';
 			check = check * -1;
 		}
 		if (check == 1)
 			quote = 'x';
-		if (str[i] == caracter && quote == 'x')
-			str[i] = caracter -128;
-		i ++;
+		str++;
+	}
+	return (check);
+}
+
+void	change_caracter(char *str, char caracter)
+{
+	int		check;
+	char	quote;
+
+	check = 1;
+	quote = 'x';
+	while (*str)
+	{
+		if (*str == '\'' && quote != 'd')
+		{
+			quote = 's';
+			check = check * -1;
+		}
+		else if (*str == '\"' && quote != 's')
+		{
+			quote = 'd';
+			check = check * -1;
+		}
+		if (check == 1)
+			quote = 'x';
+		if (*str == caracter && quote == 'x')
+			*str = caracter -128;
+		str++;
 	}
 	return ;
 }
 
-int change_caracter2(char *str)
+int	change_caracter2(char *str)
 {
-	int		i;
 	int		check;
 	char	quote;
 	int		pipes;
 
 	pipes = 0;
-	i = 0;
 	check = 1;
 	quote = 'x';
-	while (str[i])
+	while (*str)
 	{
-		if (str[i] == '\'' && quote != 'd')
+		if (*str == '\'' && quote != 'd')
 		{
 			quote = 's';
 			check = check * -1;
 		}
-		else if (str[i] == '\"' && quote != 's')
+		else if (*str == '\"' && quote != 's')
 		{
 			quote = 'd';
 			check = check * -1;
 		}
 		if (check == 1)
 			quote = 'x';
-		if (str[i] == ' ' && quote == 'x')
+		if (*str == ' ' && quote == 'x')
 		{
 			pipes ++;
-			str[i] = ' ' -128;
+			*str = ' ' -128;
 		}
-		i ++;
+		str++;
 	}
-	return(pipes);
+	return (pipes);
 }
 
-int change_caracter_q(char *str)
+int	change_caracter_q(char *str)
 {
-	int		i;
 	int		check;
 	char	quote;
 	int		num;
 
 	num = 0;
-	i = 0;
 	check = 1;
 	quote = 'x';
-	while (str[i])
+	while (*str)
 	{
-		if (str[i] == '\'' && quote != 'd')
+		if (*str == '\'' && quote != 'd')
 		{
 			num ++;
 			quote = 's';
 			check = check * -1;
-			str[i] = -128;
+			*str = -128;
 		}
-		else if (str[i] == '\"' && quote != 's')
+		else if (*str == '\"' && quote != 's')
 		{
 			num ++;
 			quote = 'd';
 			check = check * -1;
-			str[i] = -128;
+			*str = -128;
 		}
 		if (check == 1)
 			quote = 'x';
-		i ++;
+		str++;
 	}
-	return(num / 2);
+	return (num / 2);
 }
 
 int	check_mtrx_pipe(char **mtrx)
 {
 	int	i;
-	int j;
-	int flag;
-	int word;
+	int	j;
+	int	flag;
+	int	word;
 
 	word = 0;
 	flag = 0;
@@ -209,12 +210,12 @@ int	check_mtrx_pipe(char **mtrx)
 
 size_t	ft_strlen(const char *str)
 {
-	size_t i;
-	
+	size_t	i;
+
 	i = 0;
 	while (str[i] != '\0')
 		i++;
-	return(i);
+	return (i);
 }
 
 char	**ft_free(char **d, size_t start)
@@ -329,14 +330,14 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 
 char	*ft_replace(char *str, char caracter)
 {
-	char *dest;
-	int i;
-	int j;
+	char	*dest;
+	int		i;
+	int		j;
 
-	i = ft_strlen(str);
-	dest = (char *)malloc(sizeof(char) * (i + 1));
 	i = 0;
 	j = 0;
+	i = ft_strlen(str);
+	dest = (char *)malloc(sizeof(char) * (i + 1));
 	while (str[i])
 	{
 		if (str[i] != caracter)
@@ -346,43 +347,41 @@ char	*ft_replace(char *str, char caracter)
 		}
 		i++;
 	}
-	dest[j] = '\0'; 
-	return(dest);
+	dest[j] = '\0';
+	return (dest);
 }
 
 char	**ft_split_pipes(char *str)
 {
-	char **splited_argv;
-    char *tempStr;
+	char	**splited_argv;
+	char	*temp;
 
-    tempStr = ft_strdup(str);
-	change_caracter(tempStr, '|');
-	splited_argv = ft_split(tempStr, '|' -128);
-	if(check_mtrx_pipe(splited_argv))
+	temp = ft_strdup(str);
+	change_caracter(temp, '|');
+	splited_argv = ft_split(temp, '|' -128);
+	if (check_mtrx_pipe(splited_argv))
 	{
-		free(tempStr);
+		free(temp);
 		splited_argv[0][0] = -12;
 		return (splited_argv);
 	}
-    free(tempStr);
-	return(splited_argv);
+	free(temp);
+	return (splited_argv);
 }
 
 char	**ft_split_quotes(char *str)
 {
-	int caracter_value;
-	char **splited_argv;
-	char *new_str;
+	int		caracter_value;
+	char	**splited_argv;
+	char	*new_str;
 
 	caracter_value = change_caracter2(str);
 	if (caracter_value > 0)
 	{
-		//printf("-> %d\n", caracter_value);
 		splited_argv = ft_split(str, ' ' -128);
-		if(check_mtrx_pipe(splited_argv))
+		if (check_mtrx_pipe(splited_argv))
 		{
 			splited_argv[0][0] = -12;
-			//printf("%s\n", splited_argv[0]);
 			return (splited_argv);
 		}
 	}
@@ -392,10 +391,8 @@ char	**ft_split_quotes(char *str)
 		splited_argv[0] = ft_strdup(str);
 		splited_argv[1] = NULL;
 	}
-	return(splited_argv);
+	return (splited_argv);
 }
-
-
 
 char	*ft_join2(char const *s1, char const *s2)
 {
@@ -412,35 +409,33 @@ char	*ft_join2(char const *s1, char const *s2)
 		return (NULL);
 	ft_strlcpy(dest, s1, s1_len + 1);
 	ft_strlcat(&dest[s1_len], s2, s2_len + 1);
-	free((char*)s1);
+	free((char *)s1);
 	return (dest);
 }
 
-
-void    dequoter(char **mtrx)
+void	dequoter(char **mtrx)
 {
-    int i;
-	int len;
-    char **tempM;
+	int		i;
+	int		len;
+	char	**temp;
 
 	len = 0;
-    i = 0;
-    while (mtrx[i])
-    {
+	i = 0;
+	while (mtrx[i])
+	{
 		if (change_caracter_q(mtrx[i]))
 		{
-			tempM = ft_split(mtrx[i], -128);
+			temp = ft_split(mtrx[i], -128);
 			mtrx[i][0] = '\0';
-			while (tempM[len])
+			while (temp[len])
 			{
-				mtrx[i] = ft_join2(mtrx[i], tempM[len]);
-				free(tempM[len]);
+				mtrx[i] = ft_join2(mtrx[i], temp[len]);
+				free(temp[len]);
 				len ++;
 			}
-			free(tempM);
+			free(temp);
 			len = 0;
 		}
-		//printf("%s\n", mtrx[i]);
-        i ++;
-    }
+		i ++;
+	}
 }
